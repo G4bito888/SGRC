@@ -5,7 +5,7 @@ services:
     image: gvenzl/oracle-xe:21-slim
     container_name: sgrc-oracle
     environment:
-      - ORACLE_PASSWORD=SGRC_ADMIN_E7_G600
+      - ORACLE_PASSWORD=${DB_PASSWORD}
     ports:
       - "1521:1521"
     volumes:
@@ -16,7 +16,7 @@ services:
     image: neo4j:5
     container_name: sgrc-neo4j
     environment:
-      - NEO4J_AUTH=neo4j/SGRC_ADMIN_E7_G600
+      - NEO4J_AUTH=${NEO4J_USER}/${DB_PASSWORD}
     ports:
       - "7474:7474" # Panel Web
       - "7687:7687" # Conexión interna para C#
