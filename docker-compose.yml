@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  # Motor Transaccional (Para el Inventario)
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: sgrc-oracle
+    environment:
+      - ORACLE_PASSWORD=SGRC_ADMIN_E7_G600
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+
+  # Motor Logístico (Para los Grafos de Donantes/Beneficiarios)
+  neo4j-db:
+    image: neo4j:5
+    container_name: sgrc-neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/SGRC_ADMIN_E7_G600
+    ports:
+      - "7474:7474" # Panel Web
+      - "7687:7687" # Conexión interna para C#
+    volumes:
+      - neo4j_data:/data
+
+volumes:
+  oracle_data:
+  neo4j_data:
