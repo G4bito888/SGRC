@@ -3,10 +3,82 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SGRC.App"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="SGRC - Sistema de Gestión de Recursos Comunitarios" 
+        Height="650" Width="1050" 
+        MinHeight="600" MinWidth="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{materialDesign:MaterialDesignFont}">
 
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/> <ColumnDefinition Width="*"/>   </Grid.ColumnDefinitions>
+
+        <Border Background="{DynamicResource PrimaryHueDarkBrush}" Grid.Column="0">
+            <StackPanel Margin="20">
+                <TextBlock Text="SGRC" FontSize="32" FontWeight="Bold" 
+                           Foreground="White" HorizontalAlignment="Center" Margin="0,20"/>
+                <Separator Background="White" Opacity="0.3" Margin="0,10"/>
+                
+                <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        Foreground="White" HorizontalAlignment="Left" Margin="0,10">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ViewDashboard" Margin="0,0,10,0"/>
+                        <TextBlock Text="Panel de Control"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        Foreground="White" HorizontalAlignment="Left" Margin="0,10">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Box" Margin="0,0,10,0"/> <TextBlock Text="Inventario (Oracle)"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        Foreground="White" HorizontalAlignment="Left" Margin="0,10">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ChartTree" Margin="0,0,10,0"/> <TextBlock Text="Logística (Neo4j)"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Bienvenid@ admin" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,30"/>
+
+            <UniformGrid Columns="3" Grid.Row="1">
+                <materialDesign:Card Margin="10" Padding="20" Background="#f8f9fa">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="AlertCircle" Foreground="Red" Width="40" Height="40"/>
+                        <TextBlock Text="Productos por Caducar" FontSize="18" Margin="0,10"/>
+                        <TextBlock Text="12 items críticos" FontWeight="Bold" FontSize="24"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <materialDesign:Card Margin="10" Padding="20" Background="#f8f9fa">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="HandHeart" Foreground="Green" Width="40" Height="40"/>
+                        <TextBlock Text="Donaciones Hoy" FontSize="18" Margin="0,10"/>
+                        <TextBlock Text="+250 kg recibidos" FontWeight="Bold" FontSize="24"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <materialDesign:Card Margin="10" Padding="20" Background="#f8f9fa">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="DatabaseCheck" Foreground="Blue" Width="40" Height="40"/>
+                        <TextBlock Text="Sistemas de Datos" FontSize="18" Margin="0,10"/>
+                        <TextBlock Text="Oracle &amp; Neo4j Online" FontSize="16" Foreground="Gray"/>
+                    </StackPanel>
+                </materialDesign:Card>
+            </UniformGrid>
+        </Grid>
     </Grid>
 </Window>
