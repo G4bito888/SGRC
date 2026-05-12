@@ -10,36 +10,34 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using SGRC.App.Data; 
+using SGRC.App.Views; 
 
 namespace SGRC.App;
 
 public partial class MainWindow : Window
 {
+    private readonly LogisticaView _vistaLogistica;
+
     public MainWindow()
     {
         InitializeComponent();
         MessageBox.Show("¡SGRC Iniciando!");
+        _vistaLogistica = new LogisticaView();
+        PantallaPrincipal.Content = new DashboardView();
     }
 
-    private async void BtnRegistrar_Click(object sender, RoutedEventArgs e)
+    private void BtnDashboard_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            string nombre = txtNombre.Text; 
-            decimal cantidad = decimal.Parse(txtCantidad.Text);
-            DateTime caducidad = dpCaducidad.SelectedDate ?? DateTime.Now; 
-            string donante = txtDonante.Text;
-            var db = new DatabaseManager();
-            await db.RegistrarAlimentoCompleto(nombre, cantidad, caducidad, donante);
-            txtNombre.Clear();
-            txtCantidad.Clear();
-            dpCaducidad.SelectedDate = null;
-            txtDonante.Clear();
-            MessageBox.Show("¡Guardado en Oracle y Neo4j exitosamente!", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Ocurrió un error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        PantallaPrincipal.Content = new DashboardView();
+    }
+
+    private void BtnInventario_Click(object sender, RoutedEventArgs e)
+    {
+        PantallaPrincipal.Content = new InventarioView();
+    }
+
+    private void BtnLogistica_Click(object sender, RoutedEventArgs e)
+    {
+        PantallaPrincipal.Content = _vistaLogistica;
     }
 }

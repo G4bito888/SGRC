@@ -53,6 +53,16 @@ namespace SGRC.App.Data
             }
         }
 
+        public async Task<System.Collections.Generic.IEnumerable<AlimentoItem>> ObtenerInventario()
+        {
+            using (var conn = new OracleConnection(_oracleConn))
+            {
+                await conn.OpenAsync();
+                // Traemos todos los alimentos ordenados del más nuevo al más viejo
+                return await conn.QueryAsync<AlimentoItem>("SELECT * FROM ALIMENTOS ORDER BY ID_ALIMENTO DESC");
+            }
+        }
+
         public async Task RegistrarAlimentoCompleto(string nombre, decimal cantidad, DateTime caducidad, string donante)
         {
             await PrepararTablasOracle();
@@ -96,5 +106,13 @@ namespace SGRC.App.Data
         {
             _neo4jDriver?.Dispose();
         }
+    }
+
+    public class AlimentoItem
+    {
+        public int ID_ALIMENTO { get; set; }
+        public string NOMBRE { get; set; }
+        public string CATEGORIA { get; set; }
+        public string UNIDAD_MEDIDA { get; set; }
     }
 }
