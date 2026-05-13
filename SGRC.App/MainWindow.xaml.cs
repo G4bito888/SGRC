@@ -17,18 +17,20 @@ namespace SGRC.App;
 public partial class MainWindow : Window
 {
     private readonly LogisticaView _vistaLogistica;
+    private readonly DashboardView _vistaDashboard;
 
     public MainWindow()
     {
         InitializeComponent();
         MessageBox.Show("¡SGRC Iniciando!");
         _vistaLogistica = new LogisticaView();
-        PantallaPrincipal.Content = new DashboardView();
+        _vistaDashboard = new DashboardView();
+        PantallaPrincipal.Content = _vistaDashboard;
     }
 
     private void BtnDashboard_Click(object sender, RoutedEventArgs e)
     {
-        PantallaPrincipal.Content = new DashboardView();
+        PantallaPrincipal.Content = _vistaDashboard;
     }
 
     private void BtnInventario_Click(object sender, RoutedEventArgs e)

@@ -5,13 +5,57 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/> 
+            <RowDefinition Height="Auto"/> 
         </Grid.RowDefinitions>
-
+        
         <TextBlock Text="Inventario Actual (Oracle)" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+        
+        <DataGrid x:Name="gridInventario" Grid.Row="1" AutoGenerateColumns="False" 
+                  CanUserAddRows="False" IsReadOnly="True" Background="White" Foreground="Black"
+                  materialDesign:DataGridAssist.CornerRadius="10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="LOTE" Binding="{Binding ID_LOTE}"/>
+                <DataGridTextColumn Header="NOMBRE" Binding="{Binding NOMBRE}"/>
+                <DataGridTextColumn Header="CATEGORÍA" Binding="{Binding CATEGORIA}"/>
+                <DataGridTextColumn Header="CANTIDAD" Binding="{Binding CANTIDAD}"/>
+                <DataGridTextColumn Header="INGRESO" Binding="{Binding FECHA_INGRESO, StringFormat=dd/MM/yyyy}"/>
+                <DataGridTextColumn Header="CADUCIDAD" Binding="{Binding FECHA_CADUCIDAD, StringFormat=dd/MM/yyyy}"/>
+                
+                <DataGridTemplateColumn Header="ACCIÓN">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Editar" Click="BtnEditar_Click" Background="#1976D2" BorderBrush="#1976D2" Foreground="White" Padding="10,0" Margin="0,0,5,0"/>
+                                <Button Content="Eliminar" Click="BtnEliminar_Click" Background="#d32f2f" BorderBrush="#d32f2f" Foreground="White" Padding="10,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
-        <DataGrid x:Name="gridInventario" Grid.Row="1" AutoGenerateColumns="True" 
-                  IsReadOnly="True" Background="White" Foreground="Black"
-                  materialDesign:DataGridAssist.CornerRadius="10"/>
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <materialDesign:Card x:Name="panelEdicion" Padding="15" Background="#f8f9fa" Visibility="Collapsed" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock x:Name="txtEditId" Visibility="Collapsed"/>
+                    <TextBlock Text="Editando Lote:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,10,0"/>
+                    <TextBox x:Name="txtEditCantidad" materialDesign:HintAssist.Hint="Nueva Cantidad" Margin="10,0" Width="120"/>
+                    <DatePicker x:Name="dpEditCaducidad" materialDesign:HintAssist.Hint="Nueva Caducidad" Language="es-MX" Margin="10,0" Width="150"/>
+                    <Button Content="GUARDAR" Click="BtnGuardarEdicion_Click" Margin="20,0,0,0" Background="#4CAF50" BorderBrush="#4CAF50"/>                    <Button Content="X" Click="BtnCancelarEdicion_Click" Style="{StaticResource MaterialDesignFlatButton}" Margin="10,0,0,0" Foreground="Red"/>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <Button Grid.Column="1" Content="Exportar a CSV" Click="BtnExportarCSV_Click" 
+                Background="#107C41" BorderBrush="#107C41" Foreground="White" 
+                VerticalAlignment="Bottom" Height="40" Padding="15,0">
+                <Button.ToolTip>Genera un reporte completo usando Factory y Template Method</Button.ToolTip>
+            </Button>
+        </Grid>
     </Grid>
 </UserControl>
