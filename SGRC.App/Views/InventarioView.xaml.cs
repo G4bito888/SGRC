@@ -11,17 +11,22 @@ namespace SGRC.App.Views
         {
             InitializeComponent();
             CargarDatos();
+            if (SesionGlobal.RolActual == "Voluntario")
+            {
+                colAcciones.Visibility = Visibility.Collapsed;
+                panelEdicion.Visibility = Visibility.Collapsed;
+            }
         }
 
-        private async void CargarDatos()
+       private async void CargarDatos()
         {
             try 
             {
                 gridInventario.ItemsSource = await DatabaseManager.Instancia.ObtenerInventarioCompleto();
             }
-            catch (Exception) 
+            catch (Exception ex) 
             { 
-                // No mas crash, solo mensaje de error
+                MessageBox.Show($"Error al cargar la tabla: {ex.Message}", "Error de Oracle", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

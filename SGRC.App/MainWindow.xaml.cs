@@ -25,7 +25,13 @@ public partial class MainWindow : Window
         MessageBox.Show("¡SGRC Iniciando!");
         _vistaLogistica = new LogisticaView();
         _vistaDashboard = new DashboardView();
+        PantallaPrincipal.Content = new LoginView();
+    }
+
+    public void IngresarAlSistema()
+    {
         PantallaPrincipal.Content = _vistaDashboard;
+        MessageBox.Show($"Bienvenido al sistema.\nRol detectado: {SesionGlobal.RolActual}", "Autenticación Exitosa", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void BtnDashboard_Click(object sender, RoutedEventArgs e)

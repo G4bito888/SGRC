@@ -14,6 +14,22 @@
         <DataGrid x:Name="gridInventario" Grid.Row="1" AutoGenerateColumns="False" 
                   CanUserAddRows="False" IsReadOnly="True" Background="White" Foreground="Black"
                   materialDesign:DataGridAssist.CornerRadius="10">
+            
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ESTADO_SEMAFORO}" Value="CADUCADO">
+                            <Setter Property="Background" Value="#FFCDD2"/>
+                            <Setter Property="Foreground" Value="#B71C1C"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ESTADO_SEMAFORO}" Value="POR CADUCAR">
+                            <Setter Property="Background" Value="#FFF9C4"/>
+                            <Setter Property="Foreground" Value="#F57F17"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+
             <DataGrid.Columns>
                 <DataGridTextColumn Header="LOTE" Binding="{Binding ID_LOTE}"/>
                 <DataGridTextColumn Header="NOMBRE" Binding="{Binding NOMBRE}"/>
@@ -22,7 +38,15 @@
                 <DataGridTextColumn Header="INGRESO" Binding="{Binding FECHA_INGRESO, StringFormat=dd/MM/yyyy}"/>
                 <DataGridTextColumn Header="CADUCIDAD" Binding="{Binding FECHA_CADUCIDAD, StringFormat=dd/MM/yyyy}"/>
                 
-                <DataGridTemplateColumn Header="ACCIÓN">
+                <DataGridTextColumn Header="ESTADO" Binding="{Binding ESTADO_SEMAFORO}" FontWeight="Bold">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTemplateColumn x:Name="colAcciones" Header="ACCIÓN">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">

@@ -21,7 +21,7 @@ namespace SGRC.App.Data
 
     public class InventarioNotifier : ISubject 
     {
-        private static InventarioNotifier _instancia;
+        private static InventarioNotifier? _instancia;
         
         // Patron Singleton combinado para asegurar una sola instancia del notificador
         public static InventarioNotifier Instancia => _instancia ??= new InventarioNotifier();
@@ -43,7 +43,7 @@ namespace SGRC.App.Data
 
     public class DatabaseManager 
     {
-        private static DatabaseManager _instancia;
+        private static DatabaseManager? _instancia;
         public static DatabaseManager Instancia => _instancia ??= new DatabaseManager();
         private readonly string _oracleConn = "User Id=system;Password=SGRC_ADMIN_E7_G600;Data Source=localhost:1521/XE;";
         private readonly IDriver _neo4jDriver;
@@ -85,25 +85,32 @@ namespace SGRC.App.Data
         public async Task<int> ObtenerProductosCriticos()
         {
             using var conn = new OracleConnection(_oracleConn);
-            return await conn.QueryFirstOrDefaultAsync<int>("SELECT COUNT(*) FROM LOTES_INGRESO WHERE FECHA_CADUCIDAD <= SYSDATE + 7 AND ESTADO = 'DISPONIBLE'");
+            string sql = "SELECT COUNT(*) FROM LOTES_INGRESO WHERE FECHA_CADUCIDAD <= :fechaSim + 7 AND ESTADO = 'DISPONIBLE'";
+            return await conn.QueryFirstOrDefaultAsync<int>(sql, new { fechaSim = SesionGlobal.FechaSistema });
         }
 
         public async Task<decimal> ObtenerDonacionesHoy()
         {
             using var conn = new OracleConnection(_oracleConn);
-            return await conn.QueryFirstOrDefaultAsync<decimal>("SELECT NVL(SUM(CANTIDAD), 0) FROM LOTES_INGRESO WHERE TRUNC(FECHA_INGRESO) = TRUNC(SYSDATE)");
+            string sql = "SELECT NVL(SUM(CANTIDAD), 0) FROM LOTES_INGRESO WHERE TRUNC(FECHA_INGRESO) = TRUNC(:fechaSim)";
+            return await conn.QueryFirstOrDefaultAsync<decimal>(sql, new { fechaSim = SesionGlobal.FechaSistema });
         }
 
         public async Task<IEnumerable<InventarioDTO>> ObtenerInventarioCompleto()
         {
             using var conn = new OracleConnection(_oracleConn);
             string sql = @"
-                SELECT L.ID_LOTE, A.NOMBRE, A.CATEGORIA, L.CANTIDAD, A.UNIDAD_MEDIDA, L.FECHA_INGRESO, L.FECHA_CADUCIDAD
+                SELECT L.ID_LOTE, A.NOMBRE, A.CATEGORIA, L.CANTIDAD, A.UNIDAD_MEDIDA, L.FECHA_INGRESO, L.FECHA_CADUCIDAD,
+                CASE
+                    WHEN L.FECHA_CADUCIDAD < :fechaSim THEN 'CADUCADO'
+                    WHEN L.FECHA_CADUCIDAD <= :fechaSim + 7 THEN 'POR CADUCAR'
+                    ELSE 'BUENA CONDICION'
+                END AS ESTADO_SEMAFORO
                 FROM ALIMENTOS A
                 JOIN LOTES_INGRESO L ON A.ID_ALIMENTO = L.ID_ALIMENTO
                 WHERE L.ESTADO = 'DISPONIBLE'
-                ORDER BY L.FECHA_INGRESO DESC";
-            return await conn.QueryAsync<InventarioDTO>(sql);
+                ORDER BY L.FECHA_CADUCIDAD ASC";                 
+            return await conn.QueryAsync<InventarioDTO>(sql, new { fechaSim = SesionGlobal.FechaSistema.Date });
         }
 
         public async Task RegistrarAlimentoCompleto(string nombre, decimal cantidad, DateTime caducidad, string donante)
@@ -114,7 +121,6 @@ namespace SGRC.App.Data
             using (var conn = new OracleConnection(_oracleConn))
             {
                 await conn.OpenAsync();
-
                 int idAlimento = await conn.QueryFirstOrDefaultAsync<int>(
                     "SELECT ID_ALIMENTO FROM ALIMENTOS WHERE NOMBRE = :nom", 
                     new { nom = nombre });
@@ -124,15 +130,13 @@ namespace SGRC.App.Data
                     await conn.ExecuteAsync(
                         "INSERT INTO ALIMENTOS (NOMBRE, CATEGORIA, UNIDAD_MEDIDA) VALUES (:nom, 'General', 'Kg')", 
                         new { nom = nombre });
-                        
                     idAlimento = await conn.QueryFirstOrDefaultAsync<int>(
                         "SELECT ID_ALIMENTO FROM ALIMENTOS WHERE NOMBRE = :nom", 
                         new { nom = nombre });
                 }
                 
-                await conn.ExecuteAsync(
-                    "INSERT INTO LOTES_INGRESO (ID_ALIMENTO, CANTIDAD, FECHA_CADUCIDAD, ID_TRABAJADOR) VALUES (:idAlim, :cant, :cad, 1)", 
-                    new { idAlim = idAlimento, cant = cantidad, cad = caducidad });
+                await conn.ExecuteAsync("INSERT INTO LOTES_INGRESO (ID_ALIMENTO, CANTIDAD, FECHA_CADUCIDAD, ID_TRABAJADOR) VALUES (:idAlim, :cant, :cad, 1)", new { idAlim = idAlimento, cant = cantidad, cad = caducidad });
+                await conn.ExecuteAsync("COMMIT");
             }
 
             // GUARDAR RELACIÓN EN NEO4J
@@ -149,18 +153,27 @@ namespace SGRC.App.Data
         public async Task EliminarLote(int idLote)
         {
             using var conn = new OracleConnection(_oracleConn);
+            await conn.OpenAsync();
             await conn.ExecuteAsync("UPDATE LOTES_INGRESO SET ESTADO = 'ELIMINADO' WHERE ID_LOTE = :id", new { id = idLote });
-
+            
+            // Confirmamos
+            await conn.ExecuteAsync("COMMIT"); 
+            
             // Patron observer: Avisamos que se elimino algo para actualizar las tarjetas
-            InventarioNotifier.Instancia.Notify();
+            InventarioNotifier.Instancia?.Notify();
         }
 
         public async Task ActualizarLote(int idLote, decimal nuevaCantidad, DateTime nuevaCaducidad)
         {
             using var conn = new OracleConnection(_oracleConn);
+            await conn.OpenAsync();
             await conn.ExecuteAsync("UPDATE LOTES_INGRESO SET CANTIDAD = :cant, FECHA_CADUCIDAD = :cad WHERE ID_LOTE = :id", 
                 new { cant = nuevaCantidad, cad = nuevaCaducidad, id = idLote });
             InventarioNotifier.Instancia.Notify();
+
+            // Confirmamos
+            await conn.ExecuteAsync("COMMIT");
+            InventarioNotifier.Instancia?.Notify();
         }
 
         public void Dispose()
@@ -177,13 +190,13 @@ namespace SGRC.App.Data
             set; 
         }
 
-        public string NOMBRE
+        public string? NOMBRE
         { 
             get; 
             set; 
         }
 
-        public string CATEGORIA
+        public string? CATEGORIA
         { 
             get; 
             set; 
@@ -195,7 +208,7 @@ namespace SGRC.App.Data
             set; 
         }
 
-        public string UNIDAD_MEDIDA
+        public string? UNIDAD_MEDIDA
         { 
             get; 
             set; 
@@ -208,6 +221,12 @@ namespace SGRC.App.Data
         }
 
         public DateTime FECHA_CADUCIDAD 
+        { 
+            get; 
+            set; 
+        }
+
+        public string? ESTADO_SEMAFORO 
         { 
             get; 
             set; 

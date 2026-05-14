@@ -6,6 +6,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -65,7 +66,16 @@
             </materialDesign:Card>
         </UniformGrid>
 
-        <materialDesign:Card Grid.Row="2" Margin="10,20,10,10" Padding="20" Background="#f8f9fa">
+        <materialDesign:Card x:Name="panelSimulacion" Grid.Row="2" Margin="10,10,10,0" Background="#3F51B5" Foreground="White" Padding="15">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <materialDesign:PackIcon Kind="ClockFast" VerticalAlignment="Center" Margin="0,0,10,0" Width="24" Height="24"/>
+                <TextBlock Text="Saltar de fecha:" VerticalAlignment="Center" FontWeight="Bold" FontSize="16"/>
+                <DatePicker x:Name="dpSimulador" Margin="15,0" Foreground="White" Language="es-MX" Width="150"/>
+                <Button Content="SIMULAR FECHA" Click="BtnSimular_Click" Background="#FF4081" BorderBrush="#FF4081" Foreground="White"/>
+            </StackPanel>
+        </materialDesign:Card>
+
+        <materialDesign:Card Grid.Row="3" Margin="10,20,10,10" Padding="20" Background="#f8f9fa">
             <StackPanel>
                 <TextBlock Text="Registrar Nuevo Ingreso" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="Black"/>
                 <UniformGrid Columns="2">

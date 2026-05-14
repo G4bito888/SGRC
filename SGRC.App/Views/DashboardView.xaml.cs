@@ -18,7 +18,18 @@ namespace SGRC.App.Views
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += (s, e) => {
-                txtReloj.Text = DateTime.Now.ToString("hh:mm tt  M/dd/yyyy");
+                // Si la fecha del sistema es hoy, mostramos el reloj normal
+                if (SesionGlobal.FechaSistema.Date == DateTime.Now.Date)
+                {
+                    txtReloj.Text = DateTime.Now.ToString("hh:mm tt  M/dd/yyyy");
+                    txtReloj.Foreground = System.Windows.Media.Brushes.White;
+                }
+                else
+                {
+                    // Si viajamos en el tiempo, cambiamos el texto y lo ponemos en amarillo para que el profe lo note
+                    txtReloj.Text = "SIMULANDO: " + SesionGlobal.FechaSistema.ToString("dd/MM/yyyy");
+                    txtReloj.Foreground = System.Windows.Media.Brushes.Yellow;
+                }
             };
             timer.Start();
 
@@ -64,9 +75,16 @@ namespace SGRC.App.Views
         {
             try
             {
+                DateTime caducidad = dpCaducidad.SelectedDate ?? DateTime.Now; 
+
+                if (caducidad.Date < DateTime.Now.Date)
+                {
+                    MessageBox.Show("No se pueden registrar insumos con fecha de caducidad vencida.", "Rechazo Automático", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 string nombre = txtNombre.Text; 
                 decimal cantidad = decimal.Parse(txtCantidad.Text);
-                DateTime caducidad = dpCaducidad.SelectedDate ?? DateTime.Now; 
                 string donante = txtDonante.Text;
 
                 await DatabaseManager.Instancia.RegistrarAlimentoCompleto(nombre, cantidad, caducidad, donante);
@@ -81,6 +99,13 @@ namespace SGRC.App.Views
             {
                 MessageBox.Show($"Ocurrió un error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void BtnSimular_Click(object sender, RoutedEventArgs e)
+        {
+            SesionGlobal.FechaSistema = dpSimulador.SelectedDate ?? DateTime.Now;
+            InventarioNotifier.Instancia.Notify(); // ¡El Observer actualiza todo al instante! [cite: 165]
+            MessageBox.Show($"Sistema sincronizado al: {SesionGlobal.FechaSistema:dd/MM/yyyy}");
         }
     }
 }
