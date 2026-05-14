@@ -155,8 +155,6 @@ namespace SGRC.App.Data
             using var conn = new OracleConnection(_oracleConn);
             await conn.OpenAsync();
             await conn.ExecuteAsync("UPDATE LOTES_INGRESO SET ESTADO = 'ELIMINADO' WHERE ID_LOTE = :id", new { id = idLote });
-            
-            // Confirmamos
             await conn.ExecuteAsync("COMMIT"); 
             
             // Patron observer: Avisamos que se elimino algo para actualizar las tarjetas
@@ -170,8 +168,6 @@ namespace SGRC.App.Data
             await conn.ExecuteAsync("UPDATE LOTES_INGRESO SET CANTIDAD = :cant, FECHA_CADUCIDAD = :cad WHERE ID_LOTE = :id", 
                 new { cant = nuevaCantidad, cad = nuevaCaducidad, id = idLote });
             InventarioNotifier.Instancia.Notify();
-
-            // Confirmamos
             await conn.ExecuteAsync("COMMIT");
             InventarioNotifier.Instancia?.Notify();
         }

@@ -10,22 +10,25 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+
         <Grid Grid.Row="0" Margin="0,0,0,30">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
-            <TextBlock Text="Bienvenid@ admin" FontSize="28" FontWeight="SemiBold" Foreground="White"/>
+            <TextBlock x:Name="txtBienvenida" Text="Bienvenid@ ..." FontSize="28" FontWeight="SemiBold" Foreground="White"/>
             
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock x:Name="txtReloj" Text="Cargando hora..." FontSize="22" Foreground="White" FontWeight="Medium" Margin="0,0,30,0" VerticalAlignment="Center"/>
                 
-                <materialDesign:Badged x:Name="badgeNotificaciones" Badge="0" Margin="0,0,10,0">
+                <materialDesign:Badged x:Name="badgeNotificaciones" Badge="0" Margin="0,0,20,0">
                     <ToggleButton x:Name="btnNotificaciones" Style="{StaticResource MaterialDesignIconForegroundButton}" ToolTip="Notificaciones">
                         <materialDesign:PackIcon Kind="BellRingOutline" Foreground="White" Width="28" Height="28"/>
                     </ToggleButton>
                 </materialDesign:Badged>
+
+                <Button Content="Cerrar Sesión" Click="BtnCerrarSesion_Click" Background="#d32f2f" BorderBrush="#d32f2f" Foreground="White" Height="35"/>
 
                 <Popup IsOpen="{Binding IsChecked, ElementName=btnNotificaciones}" StaysOpen="False" PlacementTarget="{Binding ElementName=btnNotificaciones}" AllowsTransparency="True" VerticalOffset="10">
                     <materialDesign:Card Padding="15" Background="White" Width="280">

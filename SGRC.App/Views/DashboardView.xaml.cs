@@ -26,7 +26,7 @@ namespace SGRC.App.Views
                 }
                 else
                 {
-                    // Si viajamos en el tiempo, cambiamos el texto y lo ponemos en amarillo para que el profe lo note
+                    // Si alteramos la fecha, cambiamos el texto y lo ponemos en amarillo para que el profe lo note
                     txtReloj.Text = "SIMULANDO: " + SesionGlobal.FechaSistema.ToString("dd/MM/yyyy");
                     txtReloj.Foreground = System.Windows.Media.Brushes.Yellow;
                 }
@@ -35,8 +35,6 @@ namespace SGRC.App.Views
 
             // Aqui se mete el patron observer
             InventarioNotifier.Instancia.Attach(this);
-            
-            // Cargamos todos los datos reales al iniciar la vista
             CargarEstadisticasReales();
         }
 
@@ -69,6 +67,17 @@ namespace SGRC.App.Views
                 txtItemsCriticos.Text = "No disponible";
                 txtDonacionesHoy.Text = "No disponible";
             }
+        }
+
+        public void ActualizarInterfaz()
+        {
+            txtBienvenida.Text = $"Bienvenid@ {SesionGlobal.RolActual.ToLower()}";
+            panelSimulacion.Visibility = Visibility.Visible;
+        }
+
+        private void BtnCerrarSesion_Click(object sender, RoutedEventArgs e)
+        {
+            ((MainWindow)Application.Current.MainWindow).CerrarSesion();
         }
 
         private async void BtnRegistrar_Click(object sender, RoutedEventArgs e)
@@ -104,7 +113,7 @@ namespace SGRC.App.Views
         private void BtnSimular_Click(object sender, RoutedEventArgs e)
         {
             SesionGlobal.FechaSistema = dpSimulador.SelectedDate ?? DateTime.Now;
-            InventarioNotifier.Instancia.Notify(); // ¡El Observer actualiza todo al instante! [cite: 165]
+            InventarioNotifier.Instancia.Notify(); // El Observer actualiza todo al instante
             MessageBox.Show($"Sistema sincronizado al: {SesionGlobal.FechaSistema:dd/MM/yyyy}");
         }
     }

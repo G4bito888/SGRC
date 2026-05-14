@@ -22,17 +22,23 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        MessageBox.Show("¡SGRC Iniciando!");
         _vistaLogistica = new LogisticaView();
         _vistaDashboard = new DashboardView();
         PantallaPrincipal.Content = new LoginView();
     }
 
     public void IngresarAlSistema()
-    {
-        PantallaPrincipal.Content = _vistaDashboard;
-        MessageBox.Show($"Bienvenido al sistema.\nRol detectado: {SesionGlobal.RolActual}", "Autenticación Exitosa", MessageBoxButton.OK, MessageBoxImage.Information);
-    }
+        {
+            _vistaDashboard.ActualizarInterfaz(); 
+            PantallaPrincipal.Content = _vistaDashboard;
+            MessageBox.Show($"Bienvenido al sistema.\nRol detectado: {SesionGlobal.RolActual}", "Autenticación Exitosa", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        public void CerrarSesion()
+        {
+            SesionGlobal.RolActual = "";
+            PantallaPrincipal.Content = new LoginView();
+        }
 
     private void BtnDashboard_Click(object sender, RoutedEventArgs e)
     {

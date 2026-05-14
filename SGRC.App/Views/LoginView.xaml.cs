@@ -12,14 +12,22 @@ namespace SGRC.App.Views
 
         private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
-            if (cbRol.SelectedItem is ComboBoxItem item)
+            string usuario = txtUsuario.Text.Trim();
+            string password = txtPassword.Password;
+            if (usuario == "admin" && password == "admin123")
             {
-                SesionGlobal.RolActual = item.Content?.ToString() ?? "Admin";
+                SesionGlobal.RolActual = "Administrador";
+                ((MainWindow)Application.Current.MainWindow).IngresarAlSistema();
+            }
+            else if (usuario == "voluntario" && password == "vol123")
+            {
+                SesionGlobal.RolActual = "Voluntario";
                 ((MainWindow)Application.Current.MainWindow).IngresarAlSistema();
             }
             else
             {
-                MessageBox.Show("Por favor, selecciona un rol para ingresar.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Usuario o contraseña incorrectos. Por favor, intente de nuevo.", "Error de Autenticación", MessageBoxButton.OK, MessageBoxImage.Error);
+                txtPassword.Clear();
             }
         }
     }

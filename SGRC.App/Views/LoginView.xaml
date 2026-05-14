@@ -6,14 +6,10 @@
         <materialDesign:Card Width="350" Padding="30" VerticalAlignment="Center">
             <StackPanel>
                 <TextBlock Text="SGRC" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White" Margin="0,0,0,20"/>
-                <TextBlock Text="Seleccione su rol para ingresar" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                <TextBlock Text="Ingrese sus credenciales" HorizontalAlignment="Center" Margin="0,0,0,20"/>
                 
-                <ComboBox x:Name="cbRol" materialDesign:HintAssist.Hint="Rol de Usuario" Margin="0,10">
-                    <ComboBoxItem Content="Administrador"/>
-                    <ComboBoxItem Content="Voluntario"/>
-                </ComboBox>
-
-                <Button x:Name="btnLogin" Content="ENTRAR AL SISTEMA" Click="BtnLogin_Click" Margin="0,20,0,0"/>
+                <TextBox x:Name="txtUsuario" materialDesign:HintAssist.Hint="Usuario" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,10"/>
+                <PasswordBox x:Name="txtPassword" materialDesign:HintAssist.Hint="Contraseña" materialDesign:HintAssist.IsFloating="True" Margin="0,10,0,30"/>                <Button x:Name="btnLogin" Content="ENTRAR AL SISTEMA" Click="BtnLogin_Click"/>
             </StackPanel>
         </materialDesign:Card>
     </Grid>
