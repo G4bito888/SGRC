@@ -57,8 +57,10 @@ namespace SGRC.App.Views
             try 
             {
                 // Usamos el Singleton
-                int criticos = await DatabaseManager.Instancia.ObtenerProductosCriticos();
-                decimal hoy = await DatabaseManager.Instancia.ObtenerDonacionesHoy();
+                int criticos = await Facade.Instancia.ObtenerProductosCriticos();
+                decimal hoy = await Facade.Instancia.ObtenerDonacionesHoy();
+                /* int criticos = await DatabaseManager.Instancia.ObtenerProductosCriticos();
+                decimal hoy = await DatabaseManager.Instancia.ObtenerDonacionesHoy(); */
                 txtItemsCriticos.Text = $"{criticos} items críticos";
                 txtDonacionesHoy.Text = $"+{hoy} kg recibidos";
             }
@@ -96,7 +98,8 @@ namespace SGRC.App.Views
                 decimal cantidad = decimal.Parse(txtCantidad.Text);
                 string donante = txtDonante.Text;
 
-                await DatabaseManager.Instancia.RegistrarAlimentoCompleto(nombre, cantidad, caducidad, donante);
+                await Facade.Instancia.RegistrarAlimento(nombre, cantidad, caducidad, donante);
+                // await DatabaseManager.Instancia.RegistrarAlimentoCompleto(nombre, cantidad, caducidad, donante);
                 
                 txtNombre.Clear();
                 txtCantidad.Clear();

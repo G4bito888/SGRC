@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using SGRC.App.Data;
@@ -11,18 +12,26 @@ namespace SGRC.App.Views
         {
             InitializeComponent();
             CargarDatos();
-            if (SesionGlobal.RolActual == "Voluntario")
+
+            if (!Facade.Instancia.UsuarioTienePermisosDeEdicion())
             {
                 colAcciones.Visibility = Visibility.Collapsed;
                 panelEdicion.Visibility = Visibility.Collapsed;
             }
+
+            /* if (SesionGlobal.RolActual == "Voluntario")
+            {
+                colAcciones.Visibility = Visibility.Collapsed;
+                panelEdicion.Visibility = Visibility.Collapsed;
+            } */
         }
 
        private async void CargarDatos()
         {
             try 
             {
-                gridInventario.ItemsSource = await DatabaseManager.Instancia.ObtenerInventarioCompleto();
+                gridInventario.ItemsSource = await Facade.Instancia.ObtenerInventario();
+                // gridInventario.ItemsSource = await DatabaseManager.Instancia.ObtenerInventarioCompleto();
             }
             catch (Exception ex) 
             { 
@@ -39,7 +48,8 @@ namespace SGRC.App.Views
                 {
                     try 
                     {
-                        await DatabaseManager.Instancia.EliminarLote(seleccionado.ID_LOTE);
+                        await Facade.Instancia.EliminarLoteInventario(seleccionado.ID_LOTE);
+                        // await DatabaseManager.Instancia.EliminarLote(seleccionado.ID_LOTE);
                         CargarDatos();
                     }
                     catch (Exception ex)
@@ -65,7 +75,8 @@ namespace SGRC.App.Views
         {
             if (int.TryParse(txtEditId.Text, out int idLote) && decimal.TryParse(txtEditCantidad.Text, out decimal cant) && dpEditCaducidad.SelectedDate.HasValue)
             {
-                await DatabaseManager.Instancia.ActualizarLote(idLote, cant, dpEditCaducidad.SelectedDate.Value);
+                await Facade.Instancia.ActualizarLoteInventario(idLote, cant, dpEditCaducidad.SelectedDate.Value);
+                // await DatabaseManager.Instancia.ActualizarLote(idLote, cant, dpEditCaducidad.SelectedDate.Value);
                 panelEdicion.Visibility = Visibility.Collapsed;
                 CargarDatos();
                 MessageBox.Show("Registro actualizado correctamente.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -80,6 +91,14 @@ namespace SGRC.App.Views
         private void BtnExportarCSV_Click(object sender, RoutedEventArgs e)
         {
             try
+            {
+                if (gridInventario.ItemsSource is IEnumerable<InventarioDTO> datos)
+                {
+                    string rutaGuardada = Facade.Instancia.ExportarInventarioACSV(datos);
+                    MessageBox.Show($"¡Reporte exportado dinámicamente!\nGuardado en:\n{rutaGuardada}", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            /* try
             {
                 var datos = gridInventario.ItemsSource as System.Collections.Generic.IEnumerable<InventarioDTO>;
                 
@@ -97,7 +116,7 @@ namespace SGRC.App.Views
                     reporte.GenerarReporte(datos, rutaFinal);
                     MessageBox.Show($"¡Reporte exportado dinámicamente!\nGuardado en:\n{rutaFinal}", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-            }
+            } */
             catch (Exception ex)
             {
                 MessageBox.Show($"Ocurrió un error al exportar: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
