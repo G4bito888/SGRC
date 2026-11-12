@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="SGRC.App/SGRC.App.csproj" />
+  <Project Path="SGRC.Core/SGRC.Core.csproj" />
+  <Project Path="SGRC.GraphQL.Api/SGRC.GraphQL.Api.csproj" />
 </Solution>

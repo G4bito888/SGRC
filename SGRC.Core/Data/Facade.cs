@@ -12,9 +12,14 @@ namespace SGRC.App.Data
         private Facade() { }
 
         // Metemos toda la base de datos abajo de la alfombra
-        public async Task<IEnumerable<InventarioDTO>> ObtenerInventario()
+        /*public async Task<IEnumerable<InventarioDTO>> ObtenerInventario()
         {
             return await DatabaseManager.Instancia.ObtenerInventarioCompleto();
+        }*/
+
+        public async Task<IEnumerable<InventarioDTO>> ObtenerInventario(DateTime? fechaReferencia = null)
+        {
+            return await DatabaseManager.Instancia.ObtenerInventarioCompleto(fechaReferencia ?? DateTime.Today);
         }
 
         public async Task EliminarLoteInventario(int idLote)
@@ -41,19 +46,34 @@ namespace SGRC.App.Data
             return rutaFinal;
         }
 
-        public bool UsuarioTienePermisosDeEdicion()
+        /*public bool UsuarioTienePermisosDeEdicion()
         {
             return SesionGlobal.RolActual != "Voluntario";
+        }*/
+
+        public bool UsuarioTienePermisosDeEdicion(string rolActual)
+        {
+            return rolActual != "Voluntario";
         }
 
-        public async Task<int> ObtenerProductosCriticos()
+        /*public async Task<int> ObtenerProductosCriticos()
         {
             return await DatabaseManager.Instancia.ObtenerProductosCriticos();
+        }*/
+
+        public async Task<int> ObtenerProductosCriticos(DateTime? fechaReferencia = null)
+        {
+            return await DatabaseManager.Instancia.ObtenerProductosCriticos(fechaReferencia ?? DateTime.Today);
         }
 
-        public async Task<decimal> ObtenerDonacionesHoy()
+        /*public async Task<decimal> ObtenerDonacionesHoy()
         {
             return await DatabaseManager.Instancia.ObtenerDonacionesHoy();
+        }*/
+
+        public async Task<decimal> ObtenerDonacionesHoy(DateTime? fechaReferencia = null)
+        {
+            return await DatabaseManager.Instancia.ObtenerDonacionesHoy(fechaReferencia ?? DateTime.Today);
         }
 
         public async Task RegistrarAlimento(string nombre, decimal cantidad, DateTime caducidad, string donante)

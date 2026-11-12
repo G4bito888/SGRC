@@ -14,7 +14,8 @@ namespace SGRC.App.Views
         private async void IniciarNavegador()
         {
             await neo4jBrowser.EnsureCoreWebView2Async(null);
-            neo4jBrowser.CoreWebView2.Navigate("http://localhost:7474");
+            // neo4jBrowser.CoreWebView2.Navigate("http://localhost:7474");
+            neo4jBrowser.CoreWebView2.Navigate("http://localhost:7475");
         }
     }
 }

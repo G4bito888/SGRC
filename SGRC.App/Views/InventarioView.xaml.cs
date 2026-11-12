@@ -13,7 +13,8 @@ namespace SGRC.App.Views
             InitializeComponent();
             CargarDatos();
 
-            if (!Facade.Instancia.UsuarioTienePermisosDeEdicion())
+            //if (!Facade.Instancia.UsuarioTienePermisosDeEdicion())
+            if (!Facade.Instancia.UsuarioTienePermisosDeEdicion(SesionGlobal.RolActual))
             {
                 colAcciones.Visibility = Visibility.Collapsed;
                 panelEdicion.Visibility = Visibility.Collapsed;
@@ -30,8 +31,9 @@ namespace SGRC.App.Views
         {
             try 
             {
-                gridInventario.ItemsSource = await Facade.Instancia.ObtenerInventario();
+                // gridInventario.ItemsSource = await Facade.Instancia.ObtenerInventario();
                 // gridInventario.ItemsSource = await DatabaseManager.Instancia.ObtenerInventarioCompleto();
+                gridInventario.ItemsSource = await Facade.Instancia.ObtenerInventario(SesionGlobal.FechaSistema);
             }
             catch (Exception ex) 
             { 
