@@ -90,7 +90,7 @@ namespace SGRC.App.Views
             panelEdicion.Visibility = Visibility.Collapsed;
         }
 
-        private void BtnExportarCSV_Click(object sender, RoutedEventArgs e)
+        /* private void BtnExportarCSV_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace SGRC.App.Views
                     MessageBox.Show($"¡Reporte exportado dinámicamente!\nGuardado en:\n{rutaGuardada}", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
-            /* try
+            // try
             {
                 var datos = gridInventario.ItemsSource as System.Collections.Generic.IEnumerable<InventarioDTO>;
                 
@@ -118,10 +118,85 @@ namespace SGRC.App.Views
                     reporte.GenerarReporte(datos, rutaFinal);
                     MessageBox.Show($"¡Reporte exportado dinámicamente!\nGuardado en:\n{rutaFinal}", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-            } */
+            }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ocurrió un error al exportar: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        */
+
+        private void BtnExportarCSV_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (gridInventario.ItemsSource is IEnumerable<InventarioDTO> datos)
+                {
+                    // Conservamos los datos en memoria para reutilizarlos.
+                    var inventario = datos.ToList();
+
+                    // Reporte 1: Inventario completo.
+                    string rutaInventario =
+                        Facade.Instancia.ExportarInventarioACSV(inventario);
+
+                    // Reporte 2: Lotes por caducar.
+                    string rutaCaducidad =
+                        Facade.Instancia.ExportarLotesPorCaducarACSV(inventario);
+
+                    MessageBox.Show(
+                        $"¡Los dos reportes se generaron correctamente!\n\n" +
+                        $"Inventario completo:\n{rutaInventario}\n\n" +
+                        $"Lotes por caducar:\n{rutaCaducidad}",
+                        "Reportes exportados",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "No hay información de inventario para exportar.",
+                        "Aviso",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ocurrió un error al exportar los reportes:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BtnExportarPDF_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (gridInventario.ItemsSource is IEnumerable<InventarioDTO> datos)
+                {
+                    var inventario = datos.ToList();
+                    string rutaInventario = Facade.Instancia.ExportarInventarioAPDF(inventario);
+                    string rutaCaducidad = Facade.Instancia.ExportarLotesPorCaducarAPDF(inventario);
+                    MessageBox.Show(
+                        $"¡Los dos reportes PDF se generaron correctamente!\n\n" +
+                        $"Inventario completo:\n{rutaInventario}\n\n" +
+                        $"Lotes por caducar:\n{rutaCaducidad}",
+                        "Reportes PDF generados",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "No hay información para generar los reportes.",
+                        "Aviso",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al generar los reportes PDF: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

@@ -75,11 +75,25 @@
                 </StackPanel>
             </materialDesign:Card>
 
+            <!--
             <Button Grid.Column="1" Content="Exportar a CSV" Click="BtnExportarCSV_Click" 
                 Background="#107C41" BorderBrush="#107C41" Foreground="White" 
                 VerticalAlignment="Bottom" Height="40" Padding="15,0">
                 <Button.ToolTip>Genera un reporte completo usando Factory y Template Method</Button.ToolTip>
             </Button>
+            -->
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <!-- Exportación CSV -->
+                <Button Content="Exportar a CSV" Click="BtnExportarCSV_Click" Background="#107C41" BorderBrush="#107C41" Foreground="White" Height="40" Padding="15,0" Margin="0,0,10,0">
+                    <Button.ToolTip>Genera los reportes en formato CSV usando Factory y Template Method</Button.ToolTip>
+                </Button>
+
+                <!-- Exportación PDF -->
+                <Button Content="Exportar a PDF" Click="BtnExportarPDF_Click" Background="#D32F2F" BorderBrush="#D32F2F" Foreground="White" Height="40" Padding="15,0">
+                    <Button.ToolTip> Genera los reportes en formato PDF usando Factory y Template Method </Button.ToolTip>
+                </Button>
+            </StackPanel>
         </Grid>
     </Grid>
 </UserControl>

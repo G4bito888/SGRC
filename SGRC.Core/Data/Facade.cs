@@ -46,6 +46,50 @@ namespace SGRC.App.Data
             return rutaFinal;
         }
 
+        public string ExportarLotesPorCaducarACSV(IEnumerable<InventarioDTO> datos)
+        {
+            var lotesPorCaducar = datos.Where(x => x.ESTADO_SEMAFORO == "POR CADUCAR").ToList();
+            var reporte = ReporteFactory.CrearReporte("CSV");
+            string rutaBase = AppDomain.CurrentDomain.BaseDirectory;
+            string rutaRegistros = System.IO.Path.Combine(rutaBase, "REGISTROS");
+            System.IO.Directory.CreateDirectory(rutaRegistros);
+
+            string nombreArchivo = $"Reporte_Lotes_Por_Caducar_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            string rutaFinal = System.IO.Path.Combine(rutaRegistros, nombreArchivo);
+
+            reporte.GenerarReporte(lotesPorCaducar, rutaFinal);
+            return rutaFinal;
+        }
+
+        public string ExportarInventarioAPDF(IEnumerable<InventarioDTO> datos)
+        {
+            var reporte = ReporteFactory.CrearReporte("PDF");
+            string rutaBase = AppDomain.CurrentDomain.BaseDirectory;
+            string rutaRegistros = System.IO.Path.Combine(rutaBase, "REGISTROS");
+            System.IO.Directory.CreateDirectory(rutaRegistros);
+
+            string nombreArchivo = $"Reporte_Inventario_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+            string rutaFinal = System.IO.Path.Combine(rutaRegistros, nombreArchivo);
+
+            reporte.GenerarReporte(datos, rutaFinal);
+            return rutaFinal;
+        }
+
+        public string ExportarLotesPorCaducarAPDF(IEnumerable<InventarioDTO> datos)
+        {
+            var lotesPorCaducar = datos.Where(x => x.ESTADO_SEMAFORO == "POR CADUCAR").ToList();
+            var reporte = ReporteFactory.CrearReporte("PDF");
+            string rutaBase = AppDomain.CurrentDomain.BaseDirectory;
+            string rutaRegistros = System.IO.Path.Combine(rutaBase, "REGISTROS");
+            System.IO.Directory.CreateDirectory(rutaRegistros);
+
+            string nombreArchivo = $"Reporte_Lotes_Por_Caducar_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+            string rutaFinal = System.IO.Path.Combine(rutaRegistros, nombreArchivo);
+
+            reporte.GenerarReporte(lotesPorCaducar, rutaFinal);
+            return rutaFinal;
+        }
+
         /*public bool UsuarioTienePermisosDeEdicion()
         {
             return SesionGlobal.RolActual != "Voluntario";

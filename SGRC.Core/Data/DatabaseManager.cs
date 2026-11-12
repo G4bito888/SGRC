@@ -5,6 +5,9 @@ using Oracle.ManagedDataAccess.Client;
 using Dapper;
 using Neo4j.Driver;
 using System.Collections.Generic;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace SGRC.App.Data
 {
@@ -232,6 +235,7 @@ namespace SGRC.App.Data
         }
     }
 
+    /*
     // Template Method
     public abstract class ReporteTemplate
     {
@@ -279,4 +283,145 @@ namespace SGRC.App.Data
             throw new ArgumentException("Tipo de reporte no soportado");
         }
     }
+    */
+
+    // Template Method
+    public abstract class ReporteTemplate
+    {
+        public void GenerarReporte(
+            IEnumerable<InventarioDTO> datos,
+            string rutaArchivo)
+        {
+            if (datos == null)
+                throw new ArgumentNullException(nameof(datos));
+
+            GenerarArchivo(datos, rutaArchivo);
+        }
+
+        protected abstract void GenerarArchivo(
+            IEnumerable<InventarioDTO> datos,
+            string rutaArchivo);
+    }
+
+    // Reporte CSV
+    public class ReporteCSV : ReporteTemplate
+    {
+        protected override void GenerarArchivo(IEnumerable<InventarioDTO> datos, string rutaArchivo)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("ID_LOTE,NOMBRE,CATEGORIA,CANTIDAD,UNIDAD,FECHA_INGRESO,FECHA_CADUCIDAD");
+            foreach (var item in datos)
+            {
+                sb.AppendLine(
+                    $"{item.ID_LOTE},{item.NOMBRE},{item.CATEGORIA}," +
+                    $"{item.CANTIDAD},{item.UNIDAD_MEDIDA}," +
+                    $"{item.FECHA_INGRESO:yyyy-MM-dd}," +
+                    $"{item.FECHA_CADUCIDAD:yyyy-MM-dd}"
+                );
+            }
+            System.IO.File.WriteAllText(rutaArchivo, sb.ToString(), System.Text.Encoding.UTF8);
+        }
+    }
+
+    // Reporte PDF
+    public class ReportePDF : ReporteTemplate
+    {
+        protected override void GenerarArchivo(IEnumerable<InventarioDTO> datos, string rutaArchivo)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+            Document.Create(document =>
+            {
+                document.Page(page =>
+                {
+                    page.Size(PageSizes.A4.Landscape());
+                    page.Margin(25);
+                    page.Header()
+                        .Column(column =>
+                        {
+                            column.Item()
+                                .Text("SGRC - Sistema de Gestión de Recursos Comunitarios")
+                                .FontSize(16)
+                                .Bold();
+                            column.Item()
+                                .Text("Reporte de Inventario")
+                                .FontSize(12);
+                        });
+
+                    page.Content().Table(table =>
+                    {
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.ConstantColumn(45);
+                            columns.RelativeColumn(2);
+                            columns.RelativeColumn(1.5f);
+                            columns.RelativeColumn(1);
+                            columns.RelativeColumn(1);
+                            columns.RelativeColumn(1.3f);
+                            columns.RelativeColumn(1.3f);
+                        });
+
+                        table.Header(header =>
+                        {
+                            header.Cell().Element(CeldaEncabezado).Text("ID");
+                            header.Cell().Element(CeldaEncabezado).Text("Nombre");
+                            header.Cell().Element(CeldaEncabezado).Text("Categoría");
+                            header.Cell().Element(CeldaEncabezado).Text("Cantidad");
+                            header.Cell().Element(CeldaEncabezado).Text("Unidad");
+                            header.Cell().Element(CeldaEncabezado).Text("Ingreso");
+                            header.Cell().Element(CeldaEncabezado).Text("Caducidad");
+                        });
+
+                        foreach (var item in datos)
+                        {
+                            table.Cell().Element(CeldaContenido).Text(item.ID_LOTE.ToString());
+                            table.Cell().Element(CeldaContenido).Text(item.NOMBRE ?? "");
+                            table.Cell().Element(CeldaContenido).Text(item.CATEGORIA ?? "");
+                            table.Cell().Element(CeldaContenido).Text(item.CANTIDAD.ToString());
+                            table.Cell().Element(CeldaContenido).Text(item.UNIDAD_MEDIDA ?? "");
+                            table.Cell().Element(CeldaContenido).Text(item.FECHA_INGRESO.ToString("dd/MM/yyyy"));
+                            table.Cell().Element(CeldaContenido).Text(item.FECHA_CADUCIDAD.ToString("dd/MM/yyyy"));
+                        }
+                    });
+
+                    page.Footer()
+                        .AlignCenter()
+                        .Text(text =>
+                        {
+                            text.Span("Generado por SGRC | Página ");
+                            text.CurrentPageNumber();
+                            text.Span(" de ");
+                            text.TotalPages();
+                        });
+                });
+            }).GeneratePdf(rutaArchivo);
+        }
+
+        private static IContainer CeldaEncabezado(IContainer container)
+        {
+            return container.Background(Colors.Grey.Lighten2).Padding(5).Border(1);
+        }
+
+        private static IContainer CeldaContenido(IContainer container)
+        {
+            return container.Padding(5).BorderBottom(1).BorderColor(Colors.Grey.Lighten2);
+        }
+    }
+
+    // Factory Method
+    public static class ReporteFactory
+    {
+        public static ReporteTemplate CrearReporte(string tipo)
+        {
+            switch (tipo.ToUpper())
+            {
+                case "CSV":
+                    return new ReporteCSV();
+                case "PDF":
+                    return new ReportePDF();
+                default:
+                    throw new ArgumentException("Tipo de reporte no soportado");
+            }
+        }
+    }
+
 }
