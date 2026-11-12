@@ -120,9 +120,16 @@ namespace SGRC.App.Data
             return await DatabaseManager.Instancia.ObtenerDonacionesHoy(fechaReferencia ?? DateTime.Today);
         }
 
+        /*
         public async Task RegistrarAlimento(string nombre, decimal cantidad, DateTime caducidad, string donante)
         {
             await DatabaseManager.Instancia.RegistrarAlimentoCompleto(nombre, cantidad, caducidad, donante);
+        }
+        */
+
+        public async Task RegistrarAlimento(string nombre, decimal cantidad, DateTime caducidad, string donante, DateTime fechaIngreso)
+        {
+            await DatabaseManager.Instancia.RegistrarAlimentoCompleto(nombre, cantidad, caducidad, donante, fechaIngreso);
         }
     }
 }

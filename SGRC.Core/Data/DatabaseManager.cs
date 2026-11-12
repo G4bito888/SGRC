@@ -119,7 +119,8 @@ namespace SGRC.App.Data
             return await conn.QueryAsync<InventarioDTO>(sql, new { fechaSim = fechaReferencia });
         }
 
-        public async Task RegistrarAlimentoCompleto(string nombre, decimal cantidad, DateTime caducidad, string donante)
+        // public async Task RegistrarAlimentoCompleto(string nombre, decimal cantidad, DateTime caducidad, string donante)
+        public async Task RegistrarAlimentoCompleto(string nombre, decimal cantidad, DateTime caducidad, string donante, DateTime fechaIngreso)
         {
             await PrepararTablasOracle();
 
@@ -141,7 +142,8 @@ namespace SGRC.App.Data
                         new { nom = nombre });
                 }
                 
-                await conn.ExecuteAsync("INSERT INTO LOTES_INGRESO (ID_ALIMENTO, CANTIDAD, FECHA_CADUCIDAD, ID_TRABAJADOR) VALUES (:idAlim, :cant, :cad, 1)", new { idAlim = idAlimento, cant = cantidad, cad = caducidad });
+                // await conn.ExecuteAsync("INSERT INTO LOTES_INGRESO (ID_ALIMENTO, CANTIDAD, FECHA_CADUCIDAD, ID_TRABAJADOR) VALUES (:idAlim, :cant, :cad, 1)", new { idAlim = idAlimento, cant = cantidad, cad = caducidad });
+                await conn.ExecuteAsync(@"INSERT INTO LOTES_INGRESO (ID_ALIMENTO, CANTIDAD, FECHA_INGRESO, FECHA_CADUCIDAD, ID_TRABAJADOR) VALUES (:idAlim, :cant, :ingreso, :cad, 1)", new { idAlim = idAlimento, cant = cantidad, ingreso = fechaIngreso.Date, cad = caducidad.Date });
                 await conn.ExecuteAsync("COMMIT");
             }
 

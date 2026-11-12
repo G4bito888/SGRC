@@ -89,6 +89,7 @@ namespace SGRC.App.Views
         {
             try
             {
+                /* 
                 DateTime caducidad = dpCaducidad.SelectedDate ?? DateTime.Now; 
 
                 if (caducidad.Date < DateTime.Now.Date)
@@ -96,14 +97,24 @@ namespace SGRC.App.Views
                     MessageBox.Show("No se pueden registrar insumos con fecha de caducidad vencida.", "Rechazo Automático", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+                */
+                // Tuve que hacer un quick fix porque el DatePicker no me estaba respetando la fecha simulada, entonces ahora comparo con la fecha del sistema y no con la fecha real.
+                DateTime fechaSistema = SesionGlobal.FechaSistema.Date;
+                DateTime caducidad = dpCaducidad.SelectedDate?.Date ?? fechaSistema;
+                if (caducidad < fechaSistema)
+                {
+                    MessageBox.Show("No se pueden registrar insumos con fecha de caducidad vencida respecto a la fecha simulada.", "Rechazo Automático", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
                 string nombre = txtNombre.Text; 
                 decimal cantidad = decimal.Parse(txtCantidad.Text);
                 string donante = txtDonante.Text;
 
-                await Facade.Instancia.RegistrarAlimento(nombre, cantidad, caducidad, donante);
+                // await Facade.Instancia.RegistrarAlimento(nombre, cantidad, caducidad, donante);
                 // await DatabaseManager.Instancia.RegistrarAlimentoCompleto(nombre, cantidad, caducidad, donante);
-                
+                await Facade.Instancia.RegistrarAlimento(nombre, cantidad, caducidad, donante, fechaSistema);
+
                 txtNombre.Clear();
                 txtCantidad.Clear();
                 dpCaducidad.SelectedDate = null;
