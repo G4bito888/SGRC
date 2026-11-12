@@ -57,10 +57,13 @@ namespace SGRC.App.Views
             try 
             {
                 // Usamos el Singleton
-                int criticos = await Facade.Instancia.ObtenerProductosCriticos();
+                /*int criticos = await Facade.Instancia.ObtenerProductosCriticos();
                 decimal hoy = await Facade.Instancia.ObtenerDonacionesHoy();
-                /* int criticos = await DatabaseManager.Instancia.ObtenerProductosCriticos();
+                int criticos = await DatabaseManager.Instancia.ObtenerProductosCriticos();
                 decimal hoy = await DatabaseManager.Instancia.ObtenerDonacionesHoy(); */
+                // Originalmente usabamos singleton, luego use fachada... Pero ahora, quiero implementarlo en graphql, entonces se queda fachada pero con fecha de referencia para poder simular.
+                int criticos = await Facade.Instancia.ObtenerProductosCriticos(SesionGlobal.FechaSistema);
+                decimal hoy = await Facade.Instancia.ObtenerDonacionesHoy(SesionGlobal.FechaSistema);
                 txtItemsCriticos.Text = $"{criticos} items críticos";
                 txtDonacionesHoy.Text = $"+{hoy} kg recibidos";
             }

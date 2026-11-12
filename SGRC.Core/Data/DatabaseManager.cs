@@ -45,12 +45,12 @@ namespace SGRC.App.Data
     {
         private static DatabaseManager? _instancia;
         public static DatabaseManager Instancia => _instancia ??= new DatabaseManager();
-        private readonly string _oracleConn = "User Id=system;Password=SGRC_ADMIN_E7_G600;Data Source=localhost:1521/XE;";
+        private readonly string _oracleConn = "User Id=system;Password=SGRC_ADMIN_E2_G700;Data Source=localhost:1522/XEPDB1;";
         private readonly IDriver _neo4jDriver;
 
         private DatabaseManager()
         {
-           _neo4jDriver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("neo4j", "SGRC_ADMIN_E7_G600"));
+           _neo4jDriver = GraphDatabase.Driver("bolt://localhost:7688", AuthTokens.Basic("neo4j", "SGRC_ADMIN_E2_G700"));
         }
 
         private async Task PrepararTablasOracle()
@@ -81,22 +81,25 @@ namespace SGRC.App.Data
                 catch (OracleException ex) when (ex.Number == 955) { }
             }
         }
-
-        public async Task<int> ObtenerProductosCriticos()
+        
+        //public async Task<int> ObtenerProductosCriticos()
+        public async Task<int> ObtenerProductosCriticos(DateTime fechaReferencia)
         {
             using var conn = new OracleConnection(_oracleConn);
             string sql = "SELECT COUNT(*) FROM LOTES_INGRESO WHERE FECHA_CADUCIDAD <= :fechaSim + 7 AND ESTADO = 'DISPONIBLE'";
-            return await conn.QueryFirstOrDefaultAsync<int>(sql, new { fechaSim = SesionGlobal.FechaSistema });
+            return await conn.QueryFirstOrDefaultAsync<int>(sql, new { fechaSim = fechaReferencia });
         }
 
-        public async Task<decimal> ObtenerDonacionesHoy()
+        //public async Task<decimal> ObtenerDonacionesHoy()
+        public async Task<decimal> ObtenerDonacionesHoy(DateTime fechaReferencia)
         {
             using var conn = new OracleConnection(_oracleConn);
             string sql = "SELECT NVL(SUM(CANTIDAD), 0) FROM LOTES_INGRESO WHERE TRUNC(FECHA_INGRESO) = TRUNC(:fechaSim)";
-            return await conn.QueryFirstOrDefaultAsync<decimal>(sql, new { fechaSim = SesionGlobal.FechaSistema });
+            return await conn.QueryFirstOrDefaultAsync<decimal>(sql, new { fechaSim = fechaReferencia });
         }
 
-        public async Task<IEnumerable<InventarioDTO>> ObtenerInventarioCompleto()
+        //public async Task<IEnumerable<InventarioDTO>> ObtenerInventarioCompleto()
+        public async Task<IEnumerable<InventarioDTO>> ObtenerInventarioCompleto(DateTime fechaReferencia)
         {
             using var conn = new OracleConnection(_oracleConn);
             string sql = @"
@@ -110,7 +113,7 @@ namespace SGRC.App.Data
                 JOIN LOTES_INGRESO L ON A.ID_ALIMENTO = L.ID_ALIMENTO
                 WHERE L.ESTADO = 'DISPONIBLE'
                 ORDER BY L.FECHA_CADUCIDAD ASC";                 
-            return await conn.QueryAsync<InventarioDTO>(sql, new { fechaSim = SesionGlobal.FechaSistema.Date });
+            return await conn.QueryAsync<InventarioDTO>(sql, new { fechaSim = fechaReferencia });
         }
 
         public async Task RegistrarAlimentoCompleto(string nombre, decimal cantidad, DateTime caducidad, string donante)
